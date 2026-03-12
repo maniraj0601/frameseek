@@ -1,7 +1,7 @@
 // src/utils/timeline.ts
 
 export function positionToTime(x: number, trackWidth: number, duration: number): number {
-  if (duration === 0) return 0
+  if (duration === 0 || trackWidth === 0) return 0
   const ratio = Math.max(0, Math.min(1, x / trackWidth))
   return ratio * duration
 }

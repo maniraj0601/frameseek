@@ -25,6 +25,10 @@ describe('positionToTime', () => {
   it('returns 0 when duration is 0', () => {
     expect(positionToTime(400, 800, 0)).toBe(0)
   })
+
+  it('returns 0 when trackWidth is 0', () => {
+    expect(positionToTime(100, 0, 120)).toBe(0)
+  })
 })
 
 describe('formatTime', () => {

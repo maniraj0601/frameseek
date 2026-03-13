@@ -1,5 +1,5 @@
 // src/components/player/VideoPlayer.tsx
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useVideoPlayer } from '../../hooks/useVideoPlayer'
 import { Timeline } from './Timeline'
 import { Controls } from './Controls'
@@ -12,6 +12,11 @@ type VideoState = 'loading' | 'ready' | 'error'
 export function VideoPlayer({ videoUrl, spriteUrl, vttUrl }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoState, setVideoState] = useState<VideoState>('loading')
+
+  useEffect(() => {
+    setVideoState('loading')
+  }, [videoUrl])
+
   const { playing, currentTime, duration, volume, bufferedEnd, play, pause, seek, setVolume } = useVideoPlayer(videoRef)
 
   const handleSkip = (delta: number) => seek(Math.max(0, Math.min(duration, currentTime + delta)))

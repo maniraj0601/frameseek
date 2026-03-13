@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# FrameSeek
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + Vite + TypeScript demo of Netflix-style video timeline preview frames — powered by pre-generated sprite sheets and Vercel Blob Storage.
 
-Currently, two official plugins are available:
+Hover the scrubber to see thumbnail previews of any timestamp, even before the video loads.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## How It Works
 
-## React Compiler
+See [HOW_IT_WORKS.md](./HOW_IT_WORKS.md) for a full technical explainer.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Upload your video assets
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Place your files in `scripts/assets/`:
+   - `video.mp4` — your video file
+   - `sprites.jpg` — pre-generated sprite sheet (see HOW_IT_WORKS.md for FFmpeg command)
+   - `sprites.vtt` — WebVTT thumbnail file mapping timestamps to sprite positions
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Set `BLOB_READ_WRITE_TOKEN` in `.env.local` (get it from Vercel dashboard → Storage → Blob)
+
+3. Upload:
+   ```bash
+   npx tsx scripts/upload-assets.ts
+   ```
+
+4. Copy the printed `VIDEO_URL`, `SPRITE_URL`, `VTT_URL` values into `.env.local`
+
+### Run locally
+
+```bash
+npm run dev
 ```
+
+### Deploy
+
+```bash
+npx vercel --prod
+```
+
+Set `VIDEO_URL`, `SPRITE_URL`, `VTT_URL` as environment variables in your Vercel project settings.
+
+## Tech Stack
+
+- React 19 + Vite + TypeScript
+- Tailwind CSS v4
+- Vercel Blob Storage
+- Vitest + @testing-library/react

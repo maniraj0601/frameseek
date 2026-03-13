@@ -32,3 +32,9 @@ dist-ssr
 scripts/assets/*.mp4
 scripts/assets/*.jpg
 scripts/assets/*.vtt
+
+# compiled output next to source files
+api/*.js
+scripts/*.js
+*.tsbuildinfo
+vite.config.js

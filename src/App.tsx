@@ -1,5 +1,4 @@
-// src/App.tsx
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import type { BlobConfig, ConfigState } from './types'
 import { Nav } from './components/Nav'
 import { HeroCard } from './components/HeroCard'
@@ -8,9 +7,11 @@ import { VideoPlayer } from './components/player/VideoPlayer'
 
 export default function App() {
   const [state, setState] = useState<ConfigState>({ status: 'loading' })
+  const [retryCount, setRetryCount] = useState(0)
   const playerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setState({ status: 'loading' })
     fetch('/api/blob-config')
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -18,9 +19,11 @@ export default function App() {
       })
       .then(config => setState({ status: 'ready', config }))
       .catch(e => setState({ status: 'error', message: e.message }))
-  }, [])
+  }, [retryCount])
 
-  const scrollToPlayer = () => playerRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToPlayer = useCallback(() => {
+    playerRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
 
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px 20px' }}>
@@ -33,7 +36,7 @@ export default function App() {
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <p style={{ color: '#e50914', marginBottom: '12px' }}>Failed to load: {state.message}</p>
             <button
-              onClick={() => { setState({ status: 'loading' }); window.location.reload() }}
+              onClick={() => setRetryCount(c => c + 1)}
               style={{ background: '#111', color: 'white', border: 'none', borderRadius: '20px', padding: '10px 20px', cursor: 'pointer' }}
             >
               Retry

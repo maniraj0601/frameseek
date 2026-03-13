@@ -27,3 +27,8 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# local video assets (too large for git)
+scripts/assets/*.mp4
+scripts/assets/*.jpg
+scripts/assets/*.vtt

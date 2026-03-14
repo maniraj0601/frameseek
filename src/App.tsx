@@ -1,41 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
-import type { BlobConfig, ConfigState } from './types'
+import { useRef, useState } from 'react'
+import type { ConfigState } from './types'
 import { Nav } from './components/Nav'
 import { HeroCard } from './components/HeroCard'
 import { VideoPlayer } from './components/player/VideoPlayer'
 
-export default function App() {
-  const [state, setState] = useState<ConfigState>({ status: 'loading' })
-  const [retryCount, setRetryCount] = useState(0)
-  const playerRef = useRef<HTMLDivElement>(null)
+const { VITE_VIDEO_URL, VITE_SPRITE_URL, VITE_VTT_URL } = import.meta.env
 
-  useEffect(() => {
-    setState({ status: 'loading' })
-    fetch('/api/blob-config')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`)
-        return r.json() as Promise<BlobConfig>
-      })
-      .then(config => setState({ status: 'ready', config }))
-      .catch(e => setState({ status: 'error', message: e.message }))
-  }, [retryCount])
+export default function App() {
+  const [state] = useState<ConfigState>(() => {
+    if (VITE_VIDEO_URL && VITE_SPRITE_URL && VITE_VTT_URL) {
+      return { status: 'ready', config: { videoUrl: VITE_VIDEO_URL, spriteUrl: VITE_SPRITE_URL, vttUrl: VITE_VTT_URL } }
+    }
+    return { status: 'error', message: 'Video URLs not configured.' }
+  })
+  const playerRef = useRef<HTMLDivElement>(null)
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', gap: '16px', boxSizing: 'border-box' }}>
       <Nav />
 
       <HeroCard>
-        {state.status === 'loading' && <Skeleton />}
-
         {state.status === 'error' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '12px' }}>
             <p style={{ color: '#e50914', margin: 0 }}>Failed to load: {state.message}</p>
-            <button
-              onClick={() => setRetryCount(c => c + 1)}
-              style={{ background: '#111', color: 'white', border: 'none', borderRadius: '20px', padding: '10px 20px', cursor: 'pointer' }}
-            >
-              Retry
-            </button>
           </div>
         )}
 
@@ -49,14 +36,6 @@ export default function App() {
           </div>
         )}
       </HeroCard>
-    </div>
-  )
-}
-
-function Skeleton() {
-  return (
-    <div style={{ height: '100%', background: '#f0f0ed', borderRadius: '14px', animation: 'pulse 1.5s ease-in-out infinite' }}>
-      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
     </div>
   )
 }

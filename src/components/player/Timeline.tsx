@@ -17,6 +17,7 @@ export function Timeline({ currentTime, duration, bufferedEnd, spriteUrl, vttUrl
   const trackRef = useRef<HTMLDivElement>(null)
   const [hoverX, setHoverX] = useState<number | null>(null)
   const [trackWidth, setTrackWidth] = useState(0)
+  const [hovered, setHovered] = useState(false)
   const { getFrame, gridWidth, gridHeight, ready } = useSpritePreview(vttUrl)
 
   const getRelativeX = (e: React.MouseEvent): number => {
@@ -36,8 +37,9 @@ export function Timeline({ currentTime, duration, bufferedEnd, spriteUrl, vttUrl
   return (
     <div
       style={{ position: 'relative', padding: '12px 0 8px', cursor: 'pointer' }}
+      onMouseEnter={() => setHovered(true)}
       onMouseMove={e => setHoverX(getRelativeX(e))}
-      onMouseLeave={() => setHoverX(null)}
+      onMouseLeave={() => { setHoverX(null); setHovered(false) }}
       onClick={e => {
         const rect = trackRef.current?.getBoundingClientRect()
         if (!rect) return
@@ -59,14 +61,12 @@ export function Timeline({ currentTime, duration, bufferedEnd, spriteUrl, vttUrl
       <div
         ref={trackRef}
         style={{
-          height: '3px',
+          height: hovered ? '5px' : '3px',
           background: '#444',
           borderRadius: '2px',
           position: 'relative',
-          transition: 'height 0.1s',
+          transition: 'height 0.15s ease',
         }}
-        onMouseEnter={e => (e.currentTarget.style.height = '5px')}
-        onMouseLeave={e => (e.currentTarget.style.height = '3px')}
       >
         <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${bufferedPct}%`, background: '#666', borderRadius: '2px' }} />
         <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${playedPct}%`, background: '#e50914', borderRadius: '2px' }} />

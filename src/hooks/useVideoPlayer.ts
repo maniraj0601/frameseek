@@ -7,6 +7,7 @@ type UseVideoPlayerResult = {
   duration: number
   volume: number
   bufferedEnd: number
+  buffering: boolean
   play: () => void
   pause: () => void
   seek: (seconds: number) => void
@@ -19,6 +20,7 @@ export function useVideoPlayer(videoRef: React.RefObject<HTMLVideoElement | null
   const [duration, setDuration] = useState(0)
   const [volume, setVolumeState] = useState(1)
   const [bufferedEnd, setBufferedEnd] = useState(0)
+  const [buffering, setBuffering] = useState(false)
 
   useEffect(() => {
     const video = videoRef.current
@@ -26,9 +28,11 @@ export function useVideoPlayer(videoRef: React.RefObject<HTMLVideoElement | null
 
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
     const onLoadedMetadata = () => setDuration(video.duration)
-    const onPlay = () => setPlaying(true)
+    const onPlay = () => { setPlaying(true); setBuffering(false) }
     const onPause = () => setPlaying(false)
     const onEnded = () => setPlaying(false)
+    const onWaiting = () => setBuffering(true)
+    const onPlaying = () => setBuffering(false)
     const onProgress = () => {
       if (video.buffered.length > 0) {
         setBufferedEnd(video.buffered.end(video.buffered.length - 1))
@@ -41,6 +45,8 @@ export function useVideoPlayer(videoRef: React.RefObject<HTMLVideoElement | null
     video.addEventListener('pause', onPause)
     video.addEventListener('ended', onEnded)
     video.addEventListener('progress', onProgress)
+    video.addEventListener('waiting', onWaiting)
+    video.addEventListener('playing', onPlaying)
 
     return () => {
       video.removeEventListener('timeupdate', onTimeUpdate)
@@ -49,6 +55,8 @@ export function useVideoPlayer(videoRef: React.RefObject<HTMLVideoElement | null
       video.removeEventListener('pause', onPause)
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('progress', onProgress)
+      video.removeEventListener('waiting', onWaiting)
+      video.removeEventListener('playing', onPlaying)
     }
   }, [videoRef])
 
@@ -62,5 +70,5 @@ export function useVideoPlayer(videoRef: React.RefObject<HTMLVideoElement | null
     setVolumeState(v)
   }, [videoRef])
 
-  return { playing, currentTime, duration, volume, bufferedEnd, play, pause, seek, setVolume }
+  return { playing, currentTime, duration, volume, bufferedEnd, buffering, play, pause, seek, setVolume }
 }

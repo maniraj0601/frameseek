@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { BlobConfig, ConfigState } from './types'
 import { Nav } from './components/Nav'
 import { HeroCard } from './components/HeroCard'
-import { HeroText } from './components/HeroText'
 import { VideoPlayer } from './components/player/VideoPlayer'
 
 export default function App() {
@@ -21,20 +20,16 @@ export default function App() {
       .catch(e => setState({ status: 'error', message: e.message }))
   }, [retryCount])
 
-  const scrollToPlayer = useCallback(() => {
-    playerRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
-
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px 20px' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', gap: '16px', boxSizing: 'border-box' }}>
       <Nav />
 
       <HeroCard>
         {state.status === 'loading' && <Skeleton />}
 
         {state.status === 'error' && (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <p style={{ color: '#e50914', marginBottom: '12px' }}>Failed to load: {state.message}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '12px' }}>
+            <p style={{ color: '#e50914', margin: 0 }}>Failed to load: {state.message}</p>
             <button
               onClick={() => setRetryCount(c => c + 1)}
               style={{ background: '#111', color: 'white', border: 'none', borderRadius: '20px', padding: '10px 20px', cursor: 'pointer' }}
@@ -45,16 +40,13 @@ export default function App() {
         )}
 
         {state.status === 'ready' && (
-          <>
-            <HeroText onWatchDemo={scrollToPlayer} />
-            <div ref={playerRef}>
-              <VideoPlayer
-                videoUrl={state.config.videoUrl}
-                spriteUrl={state.config.spriteUrl}
-                vttUrl={state.config.vttUrl}
-              />
-            </div>
-          </>
+          <div ref={playerRef} style={{ height: '100%' }}>
+            <VideoPlayer
+              videoUrl={state.config.videoUrl}
+              spriteUrl={state.config.spriteUrl}
+              vttUrl={state.config.vttUrl}
+            />
+          </div>
         )}
       </HeroCard>
     </div>
@@ -63,10 +55,7 @@ export default function App() {
 
 function Skeleton() {
   return (
-    <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-      <div style={{ height: '28px', background: '#f0f0ed', borderRadius: '8px', maxWidth: '300px', margin: '0 auto 12px' }} />
-      <div style={{ height: '52px', background: '#f0f0ed', borderRadius: '8px', maxWidth: '500px', margin: '0 auto 12px' }} />
-      <div style={{ aspectRatio: '16/9', background: '#f0f0ed', borderRadius: '14px' }} />
+    <div style={{ height: '100%', background: '#f0f0ed', borderRadius: '14px', animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
     </div>
   )
